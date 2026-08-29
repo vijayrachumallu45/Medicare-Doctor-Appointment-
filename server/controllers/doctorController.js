@@ -6,7 +6,7 @@ const Appointment = require('../models/Appointment');
 // @access  Public
 const getDoctors = async (req, res) => {
   try {
-    const { specialization, search } = req.query;
+    const { specialization, search, minRating, maxFee, sortBy } = req.query;
     let filter = {};
 
     if (specialization && specialization !== 'All') {
@@ -21,7 +21,24 @@ const getDoctors = async (req, res) => {
       ];
     }
 
-    const doctors = await Doctor.find(filter).sort({ createdAt: -1 });
+    if (minRating) {
+      filter.rating = { $gte: parseFloat(minRating) };
+    }
+
+    if (maxFee) {
+      filter.consultationFee = { $lte: parseFloat(maxFee) };
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (sortBy === 'rating') {
+      sortOption = { rating: -1 };
+    } else if (sortBy === 'feeAsc') {
+      sortOption = { consultationFee: 1 };
+    } else if (sortBy === 'feeDesc') {
+      sortOption = { consultationFee: -1 };
+    }
+
+    const doctors = await Doctor.find(filter).sort(sortOption);
     return res.json(doctors);
   } catch (error) {
     console.error('Get Doctors Error:', error);

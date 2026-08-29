@@ -41,6 +41,20 @@ const doctorSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  rating: {
+    type: Number,
+    default: 4.8,
+    min: 0,
+    max: 5
+  },
+  reviewCount: {
+    type: Number,
+    default: 25
+  },
+  consultationFee: {
+    type: Number,
+    default: 100
+  },
   createdAt: {
     type: Date,
     default: Date.now
