@@ -17,6 +17,27 @@ const createAppointment = async (req, res) => {
       return res.status(404).json({ message: 'Selected doctor not found' });
     }
 
+    // Validate that appointment date is not in the past
+    const appointmentDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (isNaN(appointmentDate.getTime()) || appointmentDate < today) {
+      return res.status(400).json({ message: 'Appointment date cannot be in the past' });
+    }
+
+    // Check for double-booking conflicts
+    const existingConflict = await Appointment.findOne({
+      doctorId,
+      date,
+      time,
+      status: { $in: ['Pending', 'Confirmed'] }
+    });
+
+    if (existingConflict) {
+      return res.status(400).json({ message: 'Doctor is already booked for this date and time slot' });
+    }
+
     const appointment = await Appointment.create({
       patientId: req.user._id,
       doctorId,
