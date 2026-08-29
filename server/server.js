@@ -12,22 +12,28 @@ connectDB();
 
 const app = express();
 
+const requestLogger = require('./middleware/requestLogger');
+const { getSystemMetrics } = require('./utils/systemMetrics');
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger);
 
 // API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/doctors', require('./routes/doctorRoutes'));
 app.use('/api/appointments', require('./routes/appointmentRoutes'));
 
-// Health Check Endpoint
+// Health Check & Telemetry Endpoint
 app.get('/api/health', (req, res) => {
+  const metrics = getSystemMetrics();
   res.json({
     status: 'OK',
     message: 'MediCare Doctor Appointment System API is running smoothly',
-    timestamp: new Date()
+    timestamp: new Date(),
+    telemetry: metrics
   });
 });
 
