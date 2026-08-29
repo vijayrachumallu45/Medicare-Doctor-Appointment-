@@ -10,10 +10,13 @@ node_modules/
 .env.test.local
 .env.production.local
 
-# Production builds & coverage
+# Production builds, archives & coverage
 dist/
 build/
 coverage/
+*.zip
+*.tar.gz
+*.rar
 
 # Logs & System
 *.log
